@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>SIBINTEK</title>
+	<link rel="stylesheet" href="vendor/css/bootstrap.css">
+	<link rel="stylesheet" href="vendor/css/bootstrap-reboot.css">
+	<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+	<header class="header">
+		<div class="container">
+			<h1 class="main-title">
+				Опросник Шон Бин ли вы
+			</h1>
+		</div>
+	</header>
+	<section class="main-section">
+		<div class="container">
+			<div class="quiz">
+				<div class="breadcrumbs">
+					<ul class="breadcrumbs__list">
+					</ul>
+				</div>
+				<div class="quiz__question">
+					<h2 class="quiz__question-text" >
+					</h2>
+				</div>
+				<form class="radios-wrap" action="#" id="radio">
+				</form>
+				<button type="button" class="button button_back">Назад</button>
+				<button type="submit" class="button button_next " form="radio">Далее</button>
+			</div>	
+		</div>
+	</section>
+	<footer class="footer">
+	</footer>
+	<template id="radio-answer-template">
+		<div class="radio-wrap">
+			<input type="radio" class="radio_button" name="answer" value="prev" id="prev">
+			<label class="radio-label" for="prev"></label>
+			<span class="radio-text"></span>
+		</div>
+	</template>
+	<template id="breadcrumb-link-template">
+		<li class="breadcrumbs__element">
+			<a href="#" data-index="" class="breadcrumb"></a>
+		</li>
+	</template>
+</body>
+<script src="js/parse.js"></script>
+<script src="js/handlers.js"></script>
+<script src="js/main.js"></script>
+</html>
