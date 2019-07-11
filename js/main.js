@@ -1,3 +1,5 @@
+'use strict';
+
 (function() {
 
   var form = document.querySelector('.radios-wrap');
@@ -10,17 +12,22 @@
   var nextButton = document.querySelector('.button_next');
   var backButton = document.querySelector('.button_back');
 
-  var FIRST_QUESTION_INDEX = 0;
-  var CRUMP_MAX_LENGTH = 16;
-  var CRUMP_BEGIN_LENGTH = 8;
+  var
+    KEY_TO_CHECK_LINK = '\n',
+    FIRST_QUESTION_INDEX = 0,
+    CRUMP_MAX_LENGTH = 16,
+    CRUMP_BEGIN_LENGTH = 8,
 
-  var BreadCrumpLength = {
-    total: 16,
-    startLength: 8,
-    endLength: 8
-  }
+    BreadCrumpLength = {
+      total: 16,
+      startLength: 8,
+      endLength: 8
+    }
 
   var quizQuestionInit = function() {
+    // window.handlers.removeDefaultButtonHandler();
+    // window.handlers.removeRepeatButtonHandler();
+    
     quizStep.questionAppend();
     quizStep.radioInputsAppend();
     quizStep.breadcrumbRender();
@@ -33,24 +40,58 @@
   };
 
   Quiz.prototype = {
+
     radioInputsAppend: function() {
       this.answersFromData = this.data[this.indexOfCurrentStep].answers;
       this.backButtonToggle();
       if (this.answersFromData !== undefined) {
         answersAppend();
         nextButtonOn();
+
       } else {
         initiallyButtonOn();
       }
     },
 
     questionAppend: function() {
-      quizTitle.textContent = this.data[this.indexOfCurrentStep].question;
+      var questionString = this.data[this.indexOfCurrentStep].question;
+      var linkMarker = this.isLinkInString(questionString);
+      if (linkMarker) {
+        quizTitle.textContent = this.getLinkInString(questionString)[0];
+        var textContentForLink = this.getLinkInString(questionString)[1];
+        var link = document.createElement('a');
+        link.href = textContentForLink;
+        link.textContent = textContentForLink;
+        quizTitle.appendChild(link)
+      } else {
+        quizTitle.textContent = questionString;
+      }
     },
 
-    getTransitionIdToCurrent: function() {
+    getLinkInString: function(string) {
+      var stringWithLink;
+      stringWithLink = string.split(KEY_TO_CHECK_LINK);
+      return stringWithLink;
+    },
+
+    isLinkInString: function(string) {
+      var cuttedWords = [];
+      var isStringALink = false;
+      this.splittedString = string.split(' ');
+      this.splittedString.map(function(word) {
+        cuttedWords.push(word.slice(0, KEY_TO_CHECK_LINK.length))
+      })
+      cuttedWords.forEach(function(word) {
+        if (word === KEY_TO_CHECK_LINK) {
+          isStringALink = true;
+        }
+      })
+      return isStringALink;
+    },
+
+    getTransitionNextIdToCurrent: function() {
       this.getIdMap();
-      this.reloadCrumbsDatasetArray()
+      this.reloadCrumbsDatasetArray();
       this.indexOfCurrentStep = this.idToIndex[this.indexOfNextStep];
     },
 
@@ -67,7 +108,7 @@
       this.data.forEach((el, index) => this.idToIndex[el.id] = index);
     },
 
-    stepNext: function() {
+    getIndexOfNextStep: function() {
       var answersToCheck = this.data[this.indexOfCurrentStep].answers;
       if (answersToCheck !== undefined) {
         answersToCheck.forEach((it, index) => {
@@ -91,21 +132,51 @@
     },
 
     breadcrumbRender: function() {
-      var breadcrumb = templateForBreadcrumb.cloneNode(true);
-      var breadcrumpLink = breadcrumb.querySelector('.breadcrumb');
-      var crumbIndex = breadcrumpLink.dataset.index = this.indexOfCurrentStep;
-      var crumbQuestion = this.data[this.indexOfCurrentStep].question;
-      if (crumbQuestion.length > BreadCrumpLength.total) {
-        shortCrumb = crumbQuestion
-          .slice(0, BreadCrumpLength.startLength)
-          .concat(' ... ', crumbQuestion.slice(-BreadCrumpLength.endLength));
-        breadcrumpLink.textContent = shortCrumb;
-      } else {
-        breadcrumpLink.textContent = crumbQuestion;
+      this.areThereAnswersInDataObj = this.data[this.indexOfCurrentStep].answers;
+      if (this.areThereAnswersInDataObj !== undefined) {
+        this.breadcrumbAppend(this.getCrumb());
       }
-      if (crumbIndex < 9) {
+    },
+
+    getCrumb: function() {
+      this.getTextOfQuestion();
+      var breadcrumb = templateForBreadcrumb.cloneNode(true);
+      this.breadcrumpLink = breadcrumb.querySelector('.breadcrumb');
+      if (this.crumbQuestion.length > BreadCrumpLength.total) {
+        shortCrumb = this.crumbQuestion
+          .slice(0, BreadCrumpLength.startLength)
+          .concat(' ... ', this.crumbQuestion.slice(-BreadCrumpLength.endLength));
+        this.breadcrumpLink.textContent = shortCrumb;
+      } else {
+        this.breadcrumpLink.textContent = this.crumbQuestion;
+      }
+      return breadcrumb;
+    },
+
+    breadcrumbAppend: function(breadcrumb) {
+      var crumbIndex = this.breadcrumpLink.dataset.index = this.indexOfCurrentStep;
+      var isCrumbsDuplicated = this.checkForNotToDuplicateCrumbs(crumbIndex);
+      if (isCrumbsDuplicated) {
         breadcrumbsList.appendChild(breadcrumb);
       }
+    },
+
+    getTextOfQuestion: function() {
+      this.crumbQuestion = this.data[this.indexOfCurrentStep].question;
+    },
+
+    checkForNotToDuplicateCrumbs: function(crumbIndex) {
+      var crumbsIndexesArray = [];
+      var allBreadcrumpLinks = document.querySelectorAll('.breadcrumb');
+      var isCrumbNotReapeated = true;
+      allBreadcrumpLinks.forEach(function(link, index) {
+        crumbsIndexesArray.push(link.dataset.index);
+        if (link.dataset.index == crumbIndex) {
+          isCrumbNotReapeated = false;
+          quizStep.removeExcessCrumb();
+        }
+      })
+      return isCrumbNotReapeated;
     },
 
     removeExcessCrumb: function() {
@@ -156,7 +227,7 @@
 
   var nextButtonOn = function() {
     nextButton.textContent = 'Далее';
-    isRadioChoosed = false;
+    var isRadioChoosed = false;
     if (!isRadioChoosed) {
       nextButton.disabled = true;
     }

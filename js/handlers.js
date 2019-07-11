@@ -1,4 +1,5 @@
 (function() {
+
   var form = document.querySelector('.radios-wrap');
   var backButton = document.querySelector('.button_back');
   var forwardButton = document.querySelector('.button_next');
@@ -11,11 +12,11 @@
     window.main.quizStep.radioValue = checkedValue;
     window.main.quizStep.isRadioChoosed = true;
     nextButton.disabled = false;
-
   });
 
   var nextButtonFunctionalityToggle = {
     forwardFunctionalityOn: function() {
+      debugger
       removeRepeatButtonHandler();
       addDefaultNextButtonHandler();
     },
@@ -30,7 +31,9 @@
   };
 
   var removeRepeatButtonHandler = function() {
-    forwardButton.removeEventListener('click', renderFirstQuestion);
+    forwardButton.removeEventListener('click', function(evt) {
+      renderFirstQuestion(evt)
+    });
   };
 
   var removeDefaultButtonHandler = function() {
@@ -39,20 +42,25 @@
 
   var addRepeatButtonHandler = function() {
     nextButton.textContent = BUTTON_BEGIN_TEXT;
-    forwardButton.addEventListener('click', renderFirstQuestion);
+    forwardButton.addEventListener('click', function(evt) {
+      renderFirstQuestion(evt)
+    });
   };
 
-  var renderFirstQuestion = function() {
+  var renderFirstQuestion = function(evt) {
+    evt.stopPropagation();
     window.main.quizStep.setCurrentIndexToDefault();
     breadcrumbsList.innerHTML = '';
     renderQuestion();
   };
 
+
   var renderNextQuestion = function() {
-    window.main.quizStep.stepNext();
-    window.main.quizStep.getTransitionIdToCurrent();
+    window.main.quizStep.getIndexOfNextStep();
+    window.main.quizStep.getTransitionNextIdToCurrent();
     renderQuestion();
   };
+
 
   backButton.addEventListener('click', function() {
     window.main.quizStep.stepBack();
@@ -76,7 +84,7 @@
     window.main.quizStep.indexOfCurrentStep = breadcrumbIndex;
   };
 
-  var initRenderAccordingTargetIndex = function(argument) {
+  var initRenderAccordingTargetIndex = function() {
     window.main.quizStep.removeExcessCrumb();
     window.main.quizStep.questionAppend();
     window.main.quizStep.radioInputsAppend();
@@ -84,11 +92,15 @@
 
   var renderQuestion = function() {
     window.main.quizQuestionInit();
-    addHandlerToCrumbs()
+    addHandlerToCrumbs();
   };
 
   window.handlers = {
-    nextButtonFunctionalityToggle: nextButtonFunctionalityToggle
+    nextButtonFunctionalityToggle: nextButtonFunctionalityToggle,
+    addRepeatButtonHandler: addRepeatButtonHandler,
+    addDefaultNextButtonHandler: addDefaultNextButtonHandler,
+    removeDefaultButtonHandler: removeDefaultButtonHandler,
+    removeRepeatButtonHandler: removeRepeatButtonHandler
   };
 
 
