@@ -16,7 +16,6 @@
 
   var nextButtonFunctionalityToggle = {
     forwardFunctionalityOn: function() {
-      debugger
       removeRepeatButtonHandler();
       addDefaultNextButtonHandler();
     },
@@ -31,9 +30,7 @@
   };
 
   var removeRepeatButtonHandler = function() {
-    forwardButton.removeEventListener('click', function(evt) {
-      renderFirstQuestion(evt)
-    });
+    forwardButton.removeEventListener('click', renderFirstQuestion)
   };
 
   var removeDefaultButtonHandler = function() {
@@ -42,18 +39,14 @@
 
   var addRepeatButtonHandler = function() {
     nextButton.textContent = BUTTON_BEGIN_TEXT;
-    forwardButton.addEventListener('click', function(evt) {
-      renderFirstQuestion(evt)
-    });
+    forwardButton.addEventListener('click', renderFirstQuestion)
   };
 
-  var renderFirstQuestion = function(evt) {
-    evt.stopPropagation();
+  var renderFirstQuestion = function() {
     window.main.quizStep.setCurrentIndexToDefault();
     breadcrumbsList.innerHTML = '';
     renderQuestion();
   };
-
 
   var renderNextQuestion = function() {
     window.main.quizStep.getIndexOfNextStep();
@@ -97,10 +90,6 @@
 
   window.handlers = {
     nextButtonFunctionalityToggle: nextButtonFunctionalityToggle,
-    addRepeatButtonHandler: addRepeatButtonHandler,
-    addDefaultNextButtonHandler: addDefaultNextButtonHandler,
-    removeDefaultButtonHandler: removeDefaultButtonHandler,
-    removeRepeatButtonHandler: removeRepeatButtonHandler
   };
 
 

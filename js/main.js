@@ -12,25 +12,33 @@
   var nextButton = document.querySelector('.button_next');
   var backButton = document.querySelector('.button_back');
 
-  var
-    KEY_TO_CHECK_LINK = '\n',
-    FIRST_QUESTION_INDEX = 0,
-    CRUMP_MAX_LENGTH = 16,
-    CRUMP_BEGIN_LENGTH = 8,
+  var KEY_TO_CHECK_LINK = '\n';
+  var FIRST_QUESTION_INDEX = 0;
+  var CRUMP_MAX_LENGTH = 16;
+  var CRUMP_BEGIN_LENGTH = 8;
 
-    BreadCrumpLength = {
-      total: 16,
-      startLength: 8,
-      endLength: 8
-    }
+  var BreadCrumpLength = {
+    total: 16,
+    startLength: 8,
+    endLength: 8
+  }
 
   var quizQuestionInit = function() {
-    // window.handlers.removeDefaultButtonHandler();
-    // window.handlers.removeRepeatButtonHandler();
-    
-    quizStep.questionAppend();
-    quizStep.radioInputsAppend();
-    quizStep.breadcrumbRender();
+    try {
+      quizStep.questionAppend();
+    } catch (err) {
+      console.log('Ошибка при инициализации вопроса ' + err);
+    };
+    try {
+      quizStep.radioInputsAppend();
+    } catch (err) {
+      console.log('Ошибка при инициализации инпутов: ' + err);
+    };
+    try {
+      quizStep.breadcrumbRender();
+    } catch (err) {
+      console.log('Ошибка при инициализации хлебных крошек: ' + err);
+    };
   }
 
   var Quiz = function(data) {
@@ -47,7 +55,6 @@
       if (this.answersFromData !== undefined) {
         answersAppend();
         nextButtonOn();
-
       } else {
         initiallyButtonOn();
       }
@@ -61,6 +68,7 @@
         var textContentForLink = this.getLinkInString(questionString)[1];
         var link = document.createElement('a');
         link.href = textContentForLink;
+        link.setAttribute ('target', '_blank');
         link.textContent = textContentForLink;
         quizTitle.appendChild(link)
       } else {
@@ -143,7 +151,7 @@
       var breadcrumb = templateForBreadcrumb.cloneNode(true);
       this.breadcrumpLink = breadcrumb.querySelector('.breadcrumb');
       if (this.crumbQuestion.length > BreadCrumpLength.total) {
-        shortCrumb = this.crumbQuestion
+        var shortCrumb = this.crumbQuestion
           .slice(0, BreadCrumpLength.startLength)
           .concat(' ... ', this.crumbQuestion.slice(-BreadCrumpLength.endLength));
         this.breadcrumpLink.textContent = shortCrumb;
@@ -239,7 +247,12 @@
     window.handlers.nextButtonFunctionalityToggle.initiallFunctionalityOn();
   }
 
-  quizQuestionInit();
+  try {
+    quizQuestionInit();
+  } catch (err) {
+    console.log('Ошибка при инициализации вопроса')
+  }
+
 
   window.main = {
     quizStep: quizStep,
